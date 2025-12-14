@@ -1,1 +1,3 @@
 # CCTV Recorder
+
+This project is a lightweight C# Windows Forms–based NVR system for recording multiple IP cameras using FFmpeg. All global settings and camera configurations (RTSP URLs, credentials, folders, retention, etc.) are stored in a single JSON file, making the system easy to deploy and manage. Each camera runs in its own FFmpeg process, with a built-in watchdog to monitor process health, restart failed streams, track disk space, and automatically clean up old recordings and log files. A dynamic settings UI allows you to edit and save configuration changes without touching the JSON manually.
