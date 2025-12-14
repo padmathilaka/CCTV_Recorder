@@ -1,0 +1,109 @@
+{
+  "RecordingRoot": "D:\\Recordings",
+  "SegmentSeconds": 300,
+  "FFmpegThreads": 3,
+  "SegmentFormat": "mp4",
+  "RtspTransport": "tcp",
+  "FileNamePattern": "out%Y-%m-%d_%H-%M-%S.mp4",
+  "MinFreeSpaceMb": 10000,
+  "RetentionDays": 30,
+  "LogRetentionDays": 30,
+  "LogRoot": "C:\\CameraLog",
+
+  "Cameras": [
+    {
+      "Name": "Right Side Watch",
+      "IpAddress": "192.168.0.14",
+      "FolderName": "RightSideWatch",
+      "Tag": "Camera3",
+      "RtspHost": "192.168.0.14",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "Username": "admin",
+      "Password": "data(at)123"
+
+    },
+    {
+      "Name": "Back Yard Watch",
+      "IpAddress": "192.168.0.193",
+      "FolderName": "BackYardWatch",
+      "Tag": "Camera4",
+      "RtspHost": "192.168.0.193",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "Username": "admin",
+      "Password": "data(at)123"
+    },
+    {
+      "Name": "Back Yard Two",
+      "IpAddress": "192.168.0.187",
+      "FolderName": "BackYardTwo",
+      "Tag": "Camera5",
+      "RtspHost": "192.168.0.187",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "transportmode=unicast&profile=Profile_1",
+      "Username": "admin",
+      "Password": "data(at)123"
+    },
+    {
+      "Name": "Back Yard One",
+      "IpAddress": "192.168.0.186",
+      "FolderName": "BackYardOne",
+      "Tag": "Camera6",
+      "RtspHost": "192.168.0.186",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "transportmode=unicast&profile=Profile_1",
+      "Username": "admin",
+      "Password": "data(at)123"
+    },
+    {
+      "Name": "Gate Look",
+      "IpAddress": "192.168.0.104",
+      "FolderName": "GateLook",
+      "Tag": "Camera7",
+      "RtspHost": "192.168.0.104",
+      "RtspPort": 554,
+      "RtspPath": "/cam/realmonitor",
+      "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
+      "Username": "admin",
+      "Password": "887575wani"
+    },
+    {
+      "Name": "Back Yard Dome",
+      "IpAddress": "192.168.0.173",
+      "FolderName": "BackYardDome",
+      "Tag": "Camera8",
+      "RtspHost": "192.168.0.173",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "transportmode=unicast&profile=Profile_1",
+      "Username": "admin",
+      "Password": "data(at)123"
+    },
+    {
+      "Name": "Door Look",
+      "IpAddress": "192.168.0.180",
+      "FolderName": "DoorLooking",
+      "Tag": "Camera9",
+      "RtspHost": "192.168.0.180",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "transportmode=unicast&profile=Profile_1",
+      "Username": "admin",
+      "Password": "data(at)123"
+    },
+    {
+      "Name": "Left Side",
+      "IpAddress": "192.168.0.192",
+      "FolderName": "LeftSide",
+      "Tag": "Camera12",
+      "RtspHost": "192.168.0.192",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "Username": "admin",
+      "Password": "data(at)123"
+    }
+  ]
+}
