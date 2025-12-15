@@ -38,11 +38,11 @@ namespace FfplayTest
         private void button1_Click(object sender, EventArgs e)
         {
             GetDeviceInfo("192.168.0.180");
-            GetDeviceInfo("192.168.0.164");
-            GetDeviceInfo("192.168.0.165");
-            GetDeviceInfo("192.168.0.166");
-            GetDeviceInfo("192.168.0.167");
-            GetDeviceInfo("192.168.0.168");
+            //GetDeviceInfo("192.168.0.164");
+            //GetDeviceInfo("192.168.0.165");
+            //GetDeviceInfo("192.168.0.166");
+            //GetDeviceInfo("192.168.0.167");
+            //GetDeviceInfo("192.168.0.168");
         }
 
 
