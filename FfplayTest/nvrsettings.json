@@ -1,109 +1,208 @@
 {
-  "RecordingRoot": "D:\\Recordings",
+  "RecordingRoot": "E:\\Recordings",
   "SegmentSeconds": 300,
   "FFmpegThreads": 3,
-  "SegmentFormat": "mp4",
   "RtspTransport": "tcp",
   "FileNamePattern": "out%Y-%m-%d_%H-%M-%S.mp4",
   "MinFreeSpaceMb": 10000,
   "RetentionDays": 30,
   "LogRetentionDays": 30,
   "LogRoot": "C:\\CameraLog",
-
   "Cameras": [
     {
       "Name": "Right Side Watch",
       "IpAddress": "192.168.0.14",
       "FolderName": "RightSideWatch",
-      "Tag": "Camera3",
+      "Tag": "Camera1",
       "RtspHost": "192.168.0.14",
       "RtspPort": 554,
       "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "",
       "Username": "admin",
-      "Password": "data(at)123"
-
+      "Password": "data(at)123",
+      "RtspUrl": ""
     },
     {
       "Name": "Back Yard Watch",
-      "IpAddress": "192.168.0.193",
+      "IpAddress": "192.168.0.11",
       "FolderName": "BackYardWatch",
-      "Tag": "Camera4",
-      "RtspHost": "192.168.0.193",
+      "Tag": "Camera2",
+      "RtspHost": "192.168.0.11",
       "RtspPort": 554,
       "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "",
       "Username": "admin",
-      "Password": "data(at)123"
+      "Password": "data(at)123",
+      "RtspUrl": ""
     },
     {
       "Name": "Back Yard Two",
       "IpAddress": "192.168.0.187",
       "FolderName": "BackYardTwo",
-      "Tag": "Camera5",
+      "Tag": "Camera3",
       "RtspHost": "192.168.0.187",
       "RtspPort": 554,
       "RtspPath": "/Streaming/Channels/101",
       "RtspQuery": "transportmode=unicast&profile=Profile_1",
       "Username": "admin",
-      "Password": "data(at)123"
+      "Password": "data(at)123",
+      "RtspUrl": ""
     },
     {
       "Name": "Back Yard One",
       "IpAddress": "192.168.0.186",
       "FolderName": "BackYardOne",
-      "Tag": "Camera6",
+      "Tag": "Camera4",
       "RtspHost": "192.168.0.186",
       "RtspPort": 554,
       "RtspPath": "/Streaming/Channels/101",
       "RtspQuery": "transportmode=unicast&profile=Profile_1",
       "Username": "admin",
-      "Password": "data(at)123"
+      "Password": "data(at)123",
+      "RtspUrl": ""
     },
     {
       "Name": "Gate Look",
       "IpAddress": "192.168.0.104",
       "FolderName": "GateLook",
-      "Tag": "Camera7",
+      "Tag": "Camera5",
       "RtspHost": "192.168.0.104",
       "RtspPort": 554,
       "RtspPath": "/cam/realmonitor",
       "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
       "Username": "admin",
-      "Password": "887575wani"
+      "Password": "887575wani",
+      "RtspUrl": ""
     },
     {
       "Name": "Back Yard Dome",
       "IpAddress": "192.168.0.173",
       "FolderName": "BackYardDome",
-      "Tag": "Camera8",
+      "Tag": "Camera6",
       "RtspHost": "192.168.0.173",
       "RtspPort": 554,
       "RtspPath": "/Streaming/Channels/101",
       "RtspQuery": "transportmode=unicast&profile=Profile_1",
       "Username": "admin",
-      "Password": "data(at)123"
+      "Password": "data(at)123",
+      "RtspUrl": ""
     },
     {
-      "Name": "Door Look",
+      "Name": "WellWatch",
       "IpAddress": "192.168.0.180",
-      "FolderName": "DoorLooking",
-      "Tag": "Camera9",
+      "FolderName": "WellWatch",
+      "Tag": "Camera7",
       "RtspHost": "192.168.0.180",
       "RtspPort": 554,
       "RtspPath": "/Streaming/Channels/101",
       "RtspQuery": "transportmode=unicast&profile=Profile_1",
       "Username": "admin",
-      "Password": "data(at)123"
+      "Password": "data(at)123",
+      "RtspUrl": ""
     },
     {
       "Name": "Left Side",
       "IpAddress": "192.168.0.192",
       "FolderName": "LeftSide",
-      "Tag": "Camera12",
+      "Tag": "Camera8",
       "RtspHost": "192.168.0.192",
       "RtspPort": 554,
       "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "",
       "Username": "admin",
-      "Password": "data(at)123"
+      "Password": "data(at)123",
+      "RtspUrl": ""
+    },
+    {
+      "Name": "Garage",
+      "IpAddress": "192.168.0.105",
+      "FolderName": "Garage",
+      "Tag": "Camera9",
+      "RtspHost": "192.168.0.105",
+      "RtspPort": 554,
+      "RtspPath": "/cam/realmonitor",
+      "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
+      "Username": "admin",
+      "Password": "Nathari@#4",
+      "RtspUrl": ""
+    },
+    {
+      "Name": "Door Open Look",
+      "IpAddress": "192.168.0.101",
+      "FolderName": "DoorLook",
+      "Tag": "Camera10",
+      "RtspHost": "192.168.0.101",
+      "RtspPort": 554,
+      "RtspPath": "/cam/realmonitor",
+      "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
+      "Username": "admin",
+      "Password": "Nathari@#4",
+      "RtspUrl": ""
+    },
+    {
+      "Name": "NewDoorSearch",
+      "IpAddress": "192.168.0.107",
+      "FolderName": "NewDoorSearch",
+      "Tag": "Camera11",
+      "RtspHost": "192.168.0.107",
+      "RtspPort": 554,
+      "RtspPath": "/cam/realmonitor",
+      "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
+      "Username": "admin",
+      "Password": "Nathari@#4",
+      "RtspUrl": ""
+    },
+    {
+      "Name": "LeftSideViwer",
+      "IpAddress": "192.168.0.108",
+      "FolderName": "LeftSideViwer",
+      "Tag": "Camera12",
+      "RtspHost": "192.168.0.108",
+      "RtspPort": 554,
+      "RtspPath": "/cam/realmonitor",
+      "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
+      "Username": "admin",
+      "Password": "Nathari@#4",
+      "RtspUrl": ""
+    },
+    {
+      "Name": "LeftSideReverse",
+      "IpAddress": "192.168.0.106",
+      "FolderName": "LeftSideReverse",
+      "Tag": "Camera13",
+      "RtspHost": "192.168.0.106",
+      "RtspPort": 554,
+      "RtspPath": "/cam/realmonitor",
+      "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
+      "Username": "admin",
+      "Password": "Nathari@#4",
+      "RtspUrl": ""
+    },
+    {
+      "Name": "Gate Watch",
+      "IpAddress": "192.168.0.12",
+      "FolderName": "GateWatch",
+      "Tag": "Camera14",
+      "RtspHost": "192.168.0.12",
+      "RtspPort": 554,
+      "RtspPath": "/Streaming/Channels/101",
+      "RtspQuery": "",
+      "Username": "admin",
+      "Password": "data(at)123",
+      "RtspUrl": ""
+    },
+    {
+      "Name": "LeftSideTreeWatch",
+      "IpAddress": "192.168.0.110",
+      "FolderName": "LeftSideTreeWatch",
+      "Tag": "Camera15",
+      "RtspHost": "192.168.0.110",
+      "RtspPath": "/cam/realmonitor",
+      "RtspPort": 554,
+      "RtspQuery": "channel=1&subtype=0&unicast=true&proto=Onvif",
+      "Username": "admin",
+      "Password": "Synamon@#4",
+      "RtspUrl": ""
     }
   ]
 }

@@ -56,7 +56,7 @@
             this.lblTrialVersion.Name = "lblTrialVersion";
             this.lblTrialVersion.Size = new System.Drawing.Size(263, 19);
             this.lblTrialVersion.TabIndex = 3;
-            this.lblTrialVersion.Text = "4.02 - Recorder Version - Beta Version";
+            this.lblTrialVersion.Text = "4.03 - Recorder Version - Beta Version";
             // 
             // tmrLoader
             // 

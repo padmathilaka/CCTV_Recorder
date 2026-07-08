@@ -56,6 +56,24 @@ namespace FfplayTest
 
         private bool _configOk = false;
 
+        // ============================
+        // Timestamp-error auto-restart settings
+        // ============================
+        // Minimum time between two timestamp-triggered restarts of the SAME camera,
+        // so a burst of DTS warnings does not cause a restart loop.
+        private static readonly TimeSpan DtsRestartCooldown = TimeSpan.FromSeconds(60);
+
+        // Error patterns in ffmpeg stderr that indicate broken timestamps.
+        private static readonly string[] TimestampErrorPatterns =
+        {
+            "Non-monotonic DTS",                              // segment/mp4 muxer warning during -c copy
+            "non monotonically increasing dts to muxer",      // hard muxer error
+            "Invalid DTS",
+            "Invalid PTS",
+            "DTS discontinuity",
+            "timestamp discontinuity"
+        };
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
@@ -169,6 +187,17 @@ namespace FfplayTest
             public DateTime NextAllowedStartUtc { get; set; }
 
             public string LastErrorLine { get; set; }
+
+            // ---- Timestamp-error restart tracking ----
+            // Set to true just before we deliberately kill ffmpeg to restart it,
+            // so the Exited handler does NOT count it as a failure / apply backoff.
+            public volatile bool IntentionalRestart;
+
+            // Last time a timestamp error triggered a restart (UTC) - for cooldown.
+            public DateTime LastDtsRestartUtc = DateTime.MinValue;
+
+            // How many times timestamp errors forced a restart (for diagnostics).
+            public int DtsErrorRestartCount;
         }
 
         private sealed class GridRow
@@ -459,7 +488,7 @@ namespace FfplayTest
         }
 
         // ============================
-        // FFmpeg args (original working style)
+        // FFmpeg args (original working style + timestamp hardening)
         // ============================
         private string BuildFfmpegArgs(CameraRuntime cam)
         {
@@ -477,17 +506,21 @@ namespace FfplayTest
             // Output file pattern
             string outputFile = Path.Combine(cam.Folder, _fileNamePattern);
 
-            // EXACT style of your old working code:
-            // -rtsp_transport tcp -i "rtsp://..." -threads 3 -vcodec copy
-            // -f segment -strftime 1 -segment_format mp4 -segment_time 300 "out%Y-...mp4"
+            // Original working style, plus:
+            //  -fflags +genpts        : regenerate missing PTS from the demuxer
+            //  -reset_timestamps 1    : each 300s segment starts at t=0, so a
+            //                           camera timestamp wraparound only affects
+            //                           one segment instead of the whole recording
             return
                 $"-rtsp_transport {rtspTransport} " +
+                "-fflags +genpts " +
                 $"-i {Quote(cam.RtspUrl)} " +
                 $"-threads {_ffmpegThreads} " +
                 "-vcodec copy " +
                 "-f segment " +
                 "-strftime 1 " +
                 "-segment_format mp4 " +
+                "-reset_timestamps 1 " +
                 $"-segment_time {_segmentSeconds} " +
                 Quote(outputFile);
         }
@@ -495,6 +528,60 @@ namespace FfplayTest
         private int? SafePid(Process p)
         {
             try { return p?.Id; } catch { return null; }
+        }
+
+        // ============================
+        // Timestamp error detection + auto-restart
+        // ============================
+        private static bool IsTimestampErrorLine(string line)
+        {
+            if (string.IsNullOrEmpty(line)) return false;
+
+            foreach (var pattern in TimestampErrorPatterns)
+            {
+                if (line.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0)
+                    return true;
+            }
+            return false;
+        }
+
+        private void HandleTimestampError(CameraRuntime cam)
+        {
+            // Cooldown: DTS warnings often come in bursts (one per packet).
+            // Only restart once per cooldown window per camera.
+            if ((DateTime.UtcNow - cam.LastDtsRestartUtc) < DtsRestartCooldown)
+                return;
+
+            cam.LastDtsRestartUtc = DateTime.UtcNow;
+            cam.DtsErrorRestartCount++;
+
+            LogLine($"[{cam.Name}] Timestamp error detected in ffmpeg output -> restarting recording " +
+                    $"(restart #{cam.DtsErrorRestartCount}). Line: {cam.LastErrorLine}");
+
+            // Mark as intentional so the Exited handler skips FailCount/backoff.
+            cam.IntentionalRestart = true;
+
+            UpsertRow(cam, null, "Restarting (Timestamp)", cam.LastErrorLine, updateStartTime: false);
+
+            // Never block the stderr reader thread: do stop+start on the thread pool.
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                try
+                {
+                    StopCamera(cam);
+
+                    // Give the camera/RTSP session a moment to release, then reconnect.
+                    Thread.Sleep(2000);
+
+                    if (!_stopRequested)
+                        StartCamera(cam, "timestamp-error-restart");
+                }
+                catch (Exception ex)
+                {
+                    LogLine($"[{cam.Name}] timestamp-restart failed: {ex.Message}");
+                    cam.IntentionalRestart = false;
+                }
+            });
         }
 
         private void StartCamera(CameraRuntime cam, string reason)
@@ -577,9 +664,17 @@ namespace FfplayTest
                 if (string.IsNullOrWhiteSpace(e.Data))
                     return;
 
-                cam.LastErrorLine = e.Data.Trim();
-                LogFfmpeg(cam, e.Data);
+                string line = e.Data.Trim();
+
+                cam.LastErrorLine = line;
+                LogFfmpeg(cam, line);
                 UpsertRow(cam, SafePid(p), "Running", cam.LastErrorLine, updateStartTime: false);
+
+                // ---- NEW: detect timestamp errors and restart recording ----
+                if (IsTimestampErrorLine(line))
+                {
+                    HandleTimestampError(cam);
+                }
             };
 
             p.Exited += (s, e) =>
@@ -588,6 +683,17 @@ namespace FfplayTest
                 try { code = p.ExitCode; } catch { }
 
                 cam.Proc = null;
+
+                // ---- NEW: if WE killed it on purpose (timestamp restart), ----
+                // ---- do not count it as a failure and do not apply backoff ----
+                if (cam.IntentionalRestart)
+                {
+                    cam.IntentionalRestart = false;
+                    LogLine($"[{cam.Name}] exited code={code} (intentional restart, no backoff)");
+                    try { p.Dispose(); } catch { }
+                    return;
+                }
+
                 cam.FailCount++;
                 cam.LastFailUtc = DateTime.UtcNow;
 
@@ -724,6 +830,11 @@ namespace FfplayTest
                         }
 
                         if (!needStart) continue;
+
+                        // A timestamp restart may be in-flight; give it a moment
+                        // instead of double-starting from the watchdog.
+                        if (cam.IntentionalRestart)
+                            continue;
 
                         // Too many failures recently -> pause this camera
                         if (cam.FailCount >= 5 &&
@@ -871,6 +982,7 @@ namespace FfplayTest
 
             foreach (var cam in _cameras)
             {
+                cam.IntentionalRestart = false; // cancel any pending timestamp restarts
                 StopCamera(cam);
                 UpsertRow(cam, null, "Stopped", cam.LastErrorLine, updateStartTime: false);
             }
@@ -928,6 +1040,7 @@ namespace FfplayTest
 
             foreach (var cam in _cameras)
             {
+                cam.IntentionalRestart = false;
                 StopCamera(cam);
             }
 
