@@ -1059,5 +1059,11 @@ namespace FfplayTest
 
             LogLine("Configuration reloaded from JSON.");
         }
+
+        private void btnCameraDiscovery_Click(object sender, EventArgs e)
+        {
+            using (var f = new frmCameraDiscovery())
+                f.ShowDialog(this);
+        }
     }
 }

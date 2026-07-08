@@ -150,6 +150,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraTimeUpdater.cs" />
+    <Compile Include="frmCameraDiscovery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCameraDiscovery.Designer.cs">
+      <DependentUpon>frmCameraDiscovery.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmCameraManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -188,6 +194,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="frmCameraDiscovery.resx">
+      <DependentUpon>frmCameraDiscovery.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmCameraManager.resx">
       <DependentUpon>frmCameraManager.cs</DependentUpon>
     </EmbeddedResource>
