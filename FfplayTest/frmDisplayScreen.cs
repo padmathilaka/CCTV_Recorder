@@ -221,6 +221,10 @@ namespace FfplayTest
             // Consecutive timestamp restarts (drives the escalating cooldown:
             // 5 -> 10 -> 20 -> 30 min). Resets after a long quiet period.
             public int DtsRestartStreak;
+
+            // When the current/last ffmpeg process was started (UTC).
+            // Used to tell a healthy long run apart from a crash loop.
+            public DateTime LastProcStartUtc = DateTime.MinValue;
         }
 
         private sealed class GridRow
@@ -770,16 +774,39 @@ namespace FfplayTest
                     return;
                 }
 
-                cam.FailCount++;
-                cam.LastFailUtc = DateTime.UtcNow;
+                // How long did this ffmpeg run before exiting?
+                double ranSeconds = 0;
+                if (cam.LastProcStartUtc != DateTime.MinValue)
+                    ranSeconds = (DateTime.UtcNow - cam.LastProcStartUtc).TotalSeconds;
 
                 if (string.IsNullOrWhiteSpace(cam.LastErrorLine))
                     cam.LastErrorLine = $"ExitCode={code}";
 
-                int backoffSec = Math.Min(10 + cam.FailCount * 10, 180);
+                int backoffSec;
+                if (ranSeconds >= 60)
+                {
+                    // HEALTHY LONG RUN that ended (camera rebooted, brief network
+                    // drop, hard mux error after hours of recording, ...).
+                    // Do NOT punish it: no fail count, reconnect almost at once
+                    // so the recording gap stays as small as possible.
+                    cam.FailCount = 0;
+                    backoffSec = 5;
+                }
+                else
+                {
+                    // CRASH LOOP: process died within 60s of starting (bad
+                    // credentials, unreachable stream, wrong path...). Escalate
+                    // the wait so we don't hammer the camera: 45s, 75s, 105s...
+                    // capped at 5 minutes.
+                    cam.FailCount++;
+                    backoffSec = Math.Min(15 + cam.FailCount * 30, 300);
+                }
+
+                cam.LastFailUtc = DateTime.UtcNow;
                 cam.NextAllowedStartUtc = DateTime.UtcNow.AddSeconds(backoffSec);
 
-                LogLine($"[{cam.Name}] exited code={code} backoff={backoffSec}s lastErr='{cam.LastErrorLine}'");
+                LogLine($"[{cam.Name}] exited code={code} ran={ranSeconds:0}s " +
+                        $"failCount={cam.FailCount} backoff={backoffSec}s lastErr='{cam.LastErrorLine}'");
                 UpsertRow(cam, null, $"Exited ({code})", cam.LastErrorLine, updateStartTime: false);
 
                 try { p.Dispose(); } catch { }
@@ -789,7 +816,7 @@ namespace FfplayTest
             {
                 p.Start();
                 cam.Proc = p;
-                cam.FailCount = 0;
+                cam.LastProcStartUtc = DateTime.UtcNow;
                 cam.NextAllowedStartUtc = DateTime.MinValue;
 
                 UpsertRow(cam, SafePid(p), "Running", "", updateStartTime: true);
@@ -912,12 +939,15 @@ namespace FfplayTest
                         if (cam.IntentionalRestart)
                             continue;
 
-                        // Too many failures recently -> pause this camera
-                        if (cam.FailCount >= 5 &&
+                        // Too many failures recently -> pause this camera briefly.
+                        // (Threshold raised 5 -> 8 and pause reduced 10 min -> 3 min
+                        //  so a flaky camera recovers faster instead of sitting
+                        //  parked for long stretches with no recording.)
+                        if (cam.FailCount >= 8 &&
                             (DateTime.UtcNow - cam.LastFailUtc) < TimeSpan.FromMinutes(10))
                         {
-                            cam.NextAllowedStartUtc = DateTime.UtcNow.AddMinutes(10);
-                            UpsertRow(cam, null, "Disabled (Too many errors)", cam.LastErrorLine, updateStartTime: false);
+                            cam.NextAllowedStartUtc = DateTime.UtcNow.AddMinutes(3);
+                            UpsertRow(cam, null, "Paused (Too many errors)", cam.LastErrorLine, updateStartTime: false);
                             continue;
                         }
 
@@ -1074,12 +1104,6 @@ namespace FfplayTest
             Application.Exit();
         }
 
-        public void btnCameraDiscovery_Click(object sender, EventArgs e)
-        {
-            using (var f = new frmCameraDiscovery())
-                f.ShowDialog(this);
-        }
-
         private void btnUpdateCameraTime_Click(object sender, EventArgs e)
         {
             // Optional – placeholder
@@ -1090,6 +1114,20 @@ namespace FfplayTest
                 "Not Implemented",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
+        }
+
+        private void btnCameraDiscovery_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                frmCameraDiscovery discoveryForm = new frmCameraDiscovery();
+                discoveryForm.ShowDialog(this);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogLine("btnCameraDiscovery_Click error: " + ex.Message);
+            }
         }
 
         private void btnUpdateSettings_Click(object sender, EventArgs e)
