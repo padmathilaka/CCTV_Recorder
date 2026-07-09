@@ -35,6 +35,7 @@
             this.grdProcessDisplay = new System.Windows.Forms.DataGridView();
             this.btnUpdateCameraTime = new System.Windows.Forms.Button();
             this.btnUpdateSettings = new System.Windows.Forms.Button();
+            this.btnCameraDiscovery = new System.Windows.Forms.Button();
             this.grpUpdateStatus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdProcessDisplay)).BeginInit();
             this.SuspendLayout();
@@ -115,12 +116,24 @@
             this.btnUpdateSettings.UseVisualStyleBackColor = true;
             this.btnUpdateSettings.Click += new System.EventHandler(this.btnUpdateSettings_Click);
             // 
+            // btnCameraDiscovery
+            // 
+            this.btnCameraDiscovery.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCameraDiscovery.Location = new System.Drawing.Point(12, 208);
+            this.btnCameraDiscovery.Name = "btnCameraDiscovery";
+            this.btnCameraDiscovery.Size = new System.Drawing.Size(170, 43);
+            this.btnCameraDiscovery.TabIndex = 6;
+            this.btnCameraDiscovery.Text = "Camera Discovery";
+            this.btnCameraDiscovery.UseVisualStyleBackColor = true;
+            this.btnCameraDiscovery.Click += new System.EventHandler(this.btnCameraDiscovery_Click);
+            // 
             // frmDisplayScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(750, 374);
             this.ControlBox = false;
+            this.Controls.Add(this.btnCameraDiscovery);
             this.Controls.Add(this.btnUpdateSettings);
             this.Controls.Add(this.btnUpdateCameraTime);
             this.Controls.Add(this.grpUpdateStatus);
@@ -147,6 +160,7 @@
         private System.Windows.Forms.Button btnUpdateCameraTime;
         private System.Windows.Forms.DataGridView grdProcessDisplay;
         private System.Windows.Forms.Button btnUpdateSettings;
+        private System.Windows.Forms.Button btnCameraDiscovery;
     }
 }
 
